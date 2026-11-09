@@ -30,18 +30,18 @@ CREATE INDEX idx_users_role  ON users (role);
 -- scans it during an in-shop purchase (US-S08).
 -- ---------------------------------------------------------------
 CREATE TABLE loyalty_cards (
-    id             BIGSERIAL   PRIMARY KEY,
-    user_id        BIGINT      NOT NULL UNIQUE,
-    qr_code        VARCHAR(64) NOT NULL UNIQUE,
-    balance_cents  INTEGER     NOT NULL DEFAULT 0,
-    issued_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    issued_in_shop BOOLEAN     NOT NULL DEFAULT FALSE,
-    status         VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    id             BIGSERIAL      PRIMARY KEY,
+    user_id        BIGINT         NOT NULL UNIQUE,
+    qr_code        VARCHAR(64)    NOT NULL UNIQUE,
+    balance        NUMERIC(10,2)  NOT NULL DEFAULT 0,    -- top-up wallet, in euros
+    issued_at      TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    issued_in_shop BOOLEAN        NOT NULL DEFAULT FALSE,
+    status         VARCHAR(20)    NOT NULL DEFAULT 'ACTIVE',
 
     CONSTRAINT fk_card_user       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT card_status_valid  CHECK (status IN ('ACTIVE', 'BLOCKED')),
     -- RM01: the amount loaded on the card cannot exceed 100 euros
-    CONSTRAINT card_balance_range CHECK (balance_cents >= 0 AND balance_cents <= 10000)
+    CONSTRAINT card_balance_range CHECK (balance >= 0 AND balance <= 100)
 );
 
 CREATE INDEX idx_cards_qr_code ON loyalty_cards (qr_code);

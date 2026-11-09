@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,8 +27,8 @@ public class LoyaltyCardEntity {
     @Column(name = "qr_code", nullable = false, unique = true, length = 64)
     private String qrCode;
 
-    @Column(name = "balance_cents", nullable = false)
-    private int balanceCents;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal balance;
 
     @Column(name = "issued_in_shop", nullable = false)
     private boolean issuedInShop;
@@ -46,7 +47,7 @@ public class LoyaltyCardEntity {
     }
 
     public LoyaltyCard toDomain() {
-        return new LoyaltyCard(id, accountId, qrCode, balanceCents,
+        return new LoyaltyCard(id, accountId, qrCode, balance,
                 issuedInShop, status, issuedAt);
     }
 
@@ -55,7 +56,7 @@ public class LoyaltyCardEntity {
         entity.id = card.id();
         entity.accountId = card.accountId();
         entity.qrCode = card.qrCode();
-        entity.balanceCents = card.balanceCents();
+        entity.balance = card.balance();
         entity.issuedInShop = card.issuedInShop();
         entity.status = card.status();
         entity.issuedAt = card.issuedAt();
