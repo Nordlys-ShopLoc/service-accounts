@@ -1,8 +1,10 @@
-package fr.nordlys.accounts.repository.jpa;
+package fr.nordlys.shoploc.accounts.infrastructure.persistence.adapter;
 
-import fr.nordlys.accounts.domain.Account;
-import fr.nordlys.accounts.domain.AccountPort;
-import fr.nordlys.accounts.domain.Role;
+import fr.nordlys.shoploc.accounts.infrastructure.persistence.entity.AccountEntity;
+import fr.nordlys.shoploc.accounts.infrastructure.persistence.repository.AccountJpaRepository;
+import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
+import fr.nordlys.shoploc.accounts.domain.model.Role;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

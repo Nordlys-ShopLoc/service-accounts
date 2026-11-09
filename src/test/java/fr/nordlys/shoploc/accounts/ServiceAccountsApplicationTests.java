@@ -1,4 +1,4 @@
-package fr.nordlys.accounts;
+package fr.nordlys.shoploc.accounts;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

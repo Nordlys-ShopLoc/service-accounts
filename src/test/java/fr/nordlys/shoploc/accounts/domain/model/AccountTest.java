@@ -1,4 +1,4 @@
-package fr.nordlys.accounts.domain;
+package fr.nordlys.shoploc.accounts.domain.model;
 
 import org.junit.jupiter.api.Test;
 

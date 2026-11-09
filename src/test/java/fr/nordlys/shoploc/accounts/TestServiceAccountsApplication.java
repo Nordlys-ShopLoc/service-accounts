@@ -1,4 +1,4 @@
-package fr.nordlys.accounts;
+package fr.nordlys.shoploc.accounts;
 
 import org.springframework.boot.SpringApplication;
 

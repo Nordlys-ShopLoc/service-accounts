@@ -1,5 +1,7 @@
-package fr.nordlys.accounts.domain;
+package fr.nordlys.shoploc.accounts.domain.port;
 
+import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.domain.model.Role;
 import java.util.List;
 import java.util.Optional;
 

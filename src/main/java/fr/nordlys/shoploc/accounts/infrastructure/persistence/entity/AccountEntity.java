@@ -1,8 +1,8 @@
-package fr.nordlys.accounts.repository.jpa;
+package fr.nordlys.shoploc.accounts.infrastructure.persistence.entity;
 
-import fr.nordlys.accounts.domain.Account;
-import fr.nordlys.accounts.domain.Role;
-import fr.nordlys.accounts.domain.UserStatus;
+import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.domain.model.Role;
+import fr.nordlys.shoploc.accounts.domain.model.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

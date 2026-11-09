@@ -1,4 +1,4 @@
-package fr.nordlys.accounts.domain;
+package fr.nordlys.shoploc.accounts.domain.model;
 
 /** Role of a user on the platform. */
 public enum Role {
