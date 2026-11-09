@@ -35,7 +35,7 @@ Prérequis : Java 21 et Docker Desktop démarré.
 ./mvnw spring-boot:test-run
 ```
 
-Le service démarre sur http://localhost:8080 avec une base PostgreSQL temporaire, créée automatiquement dans Docker.
+Le service démarre sur http://localhost:8082 avec une base PostgreSQL temporaire, créée automatiquement dans Docker.
 
 ## Tests
 
@@ -53,12 +53,10 @@ docker build -t service-accounts:local .
 
 | Variable | Défaut |
 |---|---|
-| `DB_HOST` | `localhost` |
-| `DB_PORT` | `5432` |
-| `DB_NAME` | `accounts` |
-| `DB_USER` | `accounts` |
-| `DB_PASSWORD` | `accounts` |
-| `SERVER_PORT` | `8080` |
+| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5432/accounts` |
+| `SPRING_DATASOURCE_USERNAME` | `accounts` |
+| `SPRING_DATASOURCE_PASSWORD` | `accounts` |
+| `SERVER_PORT` | `8082` |
 
 ## Contribuer
 
