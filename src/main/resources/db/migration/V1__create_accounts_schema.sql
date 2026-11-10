@@ -12,12 +12,12 @@ CREATE TABLE users (
     last_name     VARCHAR(80)   NOT NULL,
     phone         VARCHAR(20),
     license_plate VARCHAR(16),                           -- US-C15, parking benefit
-    role          VARCHAR(20)   NOT NULL,                -- CLIENT | MERCHANT | ADMIN
+    role          VARCHAR(20)   NOT NULL,                -- CLIENT | MERCHANT | CITY_ADMIN | POLICE | ADMIN
     status        VARCHAR(20)   NOT NULL DEFAULT 'ACTIVE',
     created_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT users_role_valid   CHECK (role   IN ('CLIENT', 'MERCHANT', 'ADMIN')),
+    CONSTRAINT users_role_valid   CHECK (role IN ('CLIENT', 'MERCHANT', 'CITY_ADMIN', 'POLICE', 'ADMIN')),
     CONSTRAINT users_status_valid CHECK (status IN ('ACTIVE', 'SUSPENDED', 'DELETED'))
 );
 
