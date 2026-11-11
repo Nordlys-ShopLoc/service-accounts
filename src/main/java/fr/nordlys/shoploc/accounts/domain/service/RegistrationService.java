@@ -4,26 +4,33 @@ import fr.nordlys.shoploc.accounts.domain.model.Account;
 import fr.nordlys.shoploc.accounts.domain.model.Role;
 import fr.nordlys.shoploc.accounts.domain.model.UserStatus;
 import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
-import java.time.LocalDateTime;
+import fr.nordlys.shoploc.accounts.domain.port.OnlineRegistrationPort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Locale;
 
-// gere la creation des comptes clients
+// gere l'inscription en ligne des clients
 public class RegistrationService {
 
     private final AccountPort accountPort;
-    private final LoyaltyCardService loyaltyCardService;
+    private final OnlineRegistrationPort registrationPort;
+    private final LoyaltyCardService cardService;
+    private final PasswordEncoder passwordEncoder;
 
-    public RegistrationService(AccountPort accountPort, LoyaltyCardService loyaltyCardService) {
+    public RegistrationService(AccountPort accountPort, OnlineRegistrationPort registrationPort,
+                               LoyaltyCardService cardService, PasswordEncoder passwordEncoder) {
         this.accountPort = accountPort;
-        this.loyaltyCardService = loyaltyCardService;
+        this.registrationPort = registrationPort;
+        this.cardService = cardService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // valide les informations et cree un compte client
+    // cree un compte client et sa carte de fidelite
     @Transactional
-    public Account register(String firstName, String lastName, String email) {
-        if (firstName == null || firstName.isBlank()
-                || lastName == null || lastName.isBlank()
+    public Account register(String firstName, String lastName, String email, String password) {
+        if (firstName == null || firstName.isBlank() || lastName == null || lastName.isBlank()
                 || email == null || email.isBlank()) {
             throw new IllegalArgumentException("Les champs obligatoires doivent etre renseignes");
         }
@@ -34,17 +41,21 @@ public class RegistrationService {
             throw new IllegalArgumentException("Adresse email invalide");
         }
 
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins 8 caracteres");
+        }
+
         if (accountPort.existsByEmail(normalizedEmail)) {
             throw new IllegalArgumentException("Cette adresse email est deja utilisee");
         }
 
-        Account account = new Account(null, normalizedEmail, firstName.trim(),
-                lastName.trim(), null, null, Role.CLIENT, UserStatus.ACTIVE, LocalDateTime.now());
+        Account account = new Account(null, normalizedEmail, firstName.trim(), lastName.trim(),
+                null, null, Role.CLIENT, UserStatus.ACTIVE, LocalDateTime.now());
 
-        Account savedAccount = accountPort.save(account);
+        String passwordHash = passwordEncoder.encode(password);
+        Account savedAccount = registrationPort.saveWithPassword(account, passwordHash);
 
-        // attribue automatiquement une carte numerique
-        loyaltyCardService.issueCard(savedAccount.id(), false);
+        cardService.issueCard(savedAccount.id(), false);
 
         return savedAccount;
     }
