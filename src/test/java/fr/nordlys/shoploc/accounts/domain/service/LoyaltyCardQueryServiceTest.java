@@ -48,4 +48,36 @@ class LoyaltyCardQueryServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> service.getCardByAccountId(10L));
     }
+
+    // verifie qu'une carte active peut etre retrouvee avec son qr code
+    @Test
+    void shouldReturnCardByQrCode() {
+        LoyaltyCard card = new LoyaltyCard(1L, 10L, "QR123", BigDecimal.ZERO, false, CardStatus.ACTIVE, null);
+
+        when(cardPort.findByQrCode("QR123")).thenReturn(Optional.of(card));
+
+        LoyaltyCard result = service.getCardByQrCode("QR123");
+
+        assertEquals(card, result);
+        assertEquals(10L, result.accountId());
+    }
+
+    // verifie qu'une carte bloquee est refusee
+    @Test
+    void shouldRejectBlockedQrCode() {
+        LoyaltyCard card = new LoyaltyCard(1L, 10L, "QR123", BigDecimal.ZERO, false, CardStatus.BLOCKED, null);
+
+        when(cardPort.findByQrCode("QR123")).thenReturn(Optional.of(card));
+
+        assertThrows(IllegalStateException.class, () -> service.getCardByQrCode("QR123"));
+    }
+
+    // verifie qu'un qr code inconnu est refuse
+    @Test
+    void shouldRejectUnknownQrCode() {
+        when(cardPort.findByQrCode("UNKNOWN")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> service.getCardByQrCode("UNKNOWN"));
+    }
+
 }

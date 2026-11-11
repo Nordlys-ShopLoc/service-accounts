@@ -24,4 +24,17 @@ public class LoyaltyCardQueryService {
 
         return card;
     }
+
+    // recupere une carte a partir de son qr code et verifie qu'elle est active
+    public LoyaltyCard getCardByQrCode(String qrCode) {
+
+        LoyaltyCard card = cardPort.findByQrCode(qrCode).orElseThrow(() -> new IllegalArgumentException("Carte de fidelite introuvable"));
+
+        if (!card.isUsable()) {
+            throw new IllegalStateException("La carte de fidelite est bloquee");
+        }
+
+        return card;
+    }
+
 }
