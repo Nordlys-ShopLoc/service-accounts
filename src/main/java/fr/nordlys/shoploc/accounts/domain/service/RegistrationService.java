@@ -5,6 +5,7 @@ import fr.nordlys.shoploc.accounts.domain.model.Role;
 import fr.nordlys.shoploc.accounts.domain.model.UserStatus;
 import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 
 // gere la creation des comptes clients
@@ -19,6 +20,7 @@ public class RegistrationService {
     }
 
     // valide les informations et cree un compte client
+    @Transactional
     public Account register(String firstName, String lastName, String email) {
         if (firstName == null || firstName.isBlank()
                 || lastName == null || lastName.isBlank()
