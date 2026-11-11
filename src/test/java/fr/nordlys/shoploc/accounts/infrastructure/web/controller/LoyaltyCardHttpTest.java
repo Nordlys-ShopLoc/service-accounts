@@ -1,6 +1,10 @@
 package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
 
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
+import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
+import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.domain.model.Role;
+import fr.nordlys.shoploc.accounts.domain.model.UserStatus;
 import fr.nordlys.shoploc.accounts.domain.model.LoyaltyCard;
 import fr.nordlys.shoploc.accounts.domain.model.CardStatus;
 import java.math.BigDecimal;
@@ -29,6 +33,9 @@ class LoyaltyCardHttpTest {
 
     @MockitoBean
     private LoyaltyCardQueryService service;
+
+    @MockitoBean
+    private AccountPort accountPort;
 
     // refuse un utilisateur non connecte
     @Test
@@ -89,5 +96,35 @@ class LoyaltyCardHttpTest {
                 .andExpect(jsonPath("$.status").value("ACTIVE"));
 
         verify(service).getCardByQrCode("QR123");
+    }
+
+    // verifie qu'un client connecte peut consulter sa carte
+    @Test
+    @WithMockUser(username = "client@test.fr", roles = "CLIENT")
+    void clientCanGetOwnCard() throws Exception {
+        Account account = new Account(10L, "client@test.fr", "Marie", "Martin",
+                null, null, Role.CLIENT, UserStatus.ACTIVE, LocalDateTime.now());
+
+        LoyaltyCard card = new LoyaltyCard(1L, 10L, "QR123",
+                BigDecimal.ZERO, false, CardStatus.ACTIVE, LocalDateTime.now());
+
+        when(accountPort.findByEmail("client@test.fr")).thenReturn(java.util.Optional.of(account));
+        when(service.getCardByAccountId(10L)).thenReturn(card);
+
+        mockMvc.perform(get("/api/v1/cards/me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.qrCode").value("QR123"));
+
+        verify(service).getCardByAccountId(10L);
+    }
+
+    // refuse un commercant sur la route reservee aux clients
+    @Test
+    @WithMockUser(roles = "MERCHANT")
+    void merchantCannotAccessClientCard() throws Exception {
+        mockMvc.perform(get("/api/v1/cards/me"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(accountPort);
     }
 }

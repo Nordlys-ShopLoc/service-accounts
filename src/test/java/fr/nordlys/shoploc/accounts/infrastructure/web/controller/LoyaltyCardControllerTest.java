@@ -1,6 +1,7 @@
 package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
 
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
+import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ class LoyaltyCardControllerTest {
     @BeforeEach
     void setUp() {
         service = mock(LoyaltyCardQueryService.class);
-        controller = new LoyaltyCardController(service);
+        controller = new LoyaltyCardController(service, mock(AccountPort.class));
     }
 
     // verifie que la route de scan est reservee aux commercants
