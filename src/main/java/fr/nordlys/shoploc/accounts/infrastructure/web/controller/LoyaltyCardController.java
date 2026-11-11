@@ -2,9 +2,16 @@ package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
 
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
 import fr.nordlys.shoploc.accounts.infrastructure.web.dto.LoyaltyCardResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// prepare les operations de consultation des cartes de fidelite
-// les routes seront ajoutees apres l'integration de l'authentification
+// permet au commercant de verifier une carte avec son qr code
+@RestController
+@RequestMapping("/api/v1/cards")
 public class LoyaltyCardController {
 
     private final LoyaltyCardQueryService service;
@@ -13,13 +20,10 @@ public class LoyaltyCardController {
         this.service = service;
     }
 
-    // recupere les informations d'une carte a partir du compte
-    public LoyaltyCardResponse getCardByAccountId(Long accountId) {
-        return LoyaltyCardResponse.from(service.getCardByAccountId(accountId));
-    }
-
-    // recupere les informations d'une carte a partir du qr code
-    public LoyaltyCardResponse getCardByQrCode(String qrCode) {
-        return LoyaltyCardResponse.from(service.getCardByQrCode(qrCode));
+    // identifie une carte active a partir de son qr code
+    @GetMapping("/scan/{qrCode}")
+    @PreAuthorize("hasRole('MERCHANT')")
+    public ResponseEntity<LoyaltyCardResponse> getCardByQrCode(@PathVariable String qrCode) {
+        return ResponseEntity.ok(LoyaltyCardResponse.from(service.getCardByQrCode(qrCode)));
     }
 }
