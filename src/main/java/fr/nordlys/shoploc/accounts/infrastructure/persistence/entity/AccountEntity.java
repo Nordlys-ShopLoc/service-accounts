@@ -21,7 +21,7 @@ public class AccountEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 180)
+    @Column(unique = true, length = 180)
     private String email;
 
     /** Null when the account was created in a shop, without application access. */
