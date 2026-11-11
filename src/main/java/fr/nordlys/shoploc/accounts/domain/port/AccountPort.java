@@ -19,4 +19,8 @@ public interface AccountPort {
     Account save(Account account);
 
     boolean existsByEmail(String email);
+
+    Optional<String> findPasswordHash(Long accountId);
+
+    void savePasswordHash(Long accountId, String passwordHash);
 }
