@@ -1,6 +1,8 @@
 package fr.nordlys.shoploc.accounts.infrastructure.config;
 
+import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.port.LoyaltyCardPort;
+import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +19,16 @@ public class DomainServicesConfiguration {
     LoyaltyCardService loyaltyCardService(LoyaltyCardPort cardPort) {
         return new LoyaltyCardService(cardPort);
     }
+
      // declare le service de consultation des cartes de fidelite
     @Bean
     LoyaltyCardQueryService loyaltyCardQueryService(LoyaltyCardPort cardPort) {
         return new LoyaltyCardQueryService(cardPort);
+
+    @Bean
+    InShopRegistrationService inShopRegistrationService(AccountPort accountPort,
+                                                        LoyaltyCardService loyaltyCardService) {
+        return new InShopRegistrationService(accountPort, loyaltyCardService);
+
     }
 }
