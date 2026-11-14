@@ -6,12 +6,18 @@ import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import fr.nordlys.shoploc.accounts.domain.exception.InvalidCredentialsException;
 import fr.nordlys.shoploc.accounts.domain.exception.OperationNotAllowedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+    ProblemDetail badRequest(Exception exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Informations invalides");
+    }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     ProblemDetail unauthorized(InvalidCredentialsException exception) {
