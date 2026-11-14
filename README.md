@@ -10,22 +10,38 @@ Module M1 du cahier des charges : inscription en ligne ou en boutique, authentif
 
 | Table | Contenu |
 |---|---|
-| `users` | comptes clients, commerçants et administrateurs |
+| `users` | comptes clients, commerçants, agents de la collectivité, policiers municipaux et administrateurs |
 | `loyalty_cards` | cartes de fidélité : QR code, solde, statut |
 
 Les migrations Flyway sont dans `src/main/resources/db/migration`. Un schéma déjà appliqué ne se modifie jamais : toute évolution passe par un nouveau fichier `V<n>__description.sql`.
 
+## API
+
+Accessible à travers la passerelle `api-gateway`.
+
+| Méthode | Chemin | Rôle |
+|---|---|---|
+| POST | `/api/v1/auth/login` | connexion : renvoie un jeton JWT valable une heure |
+
+Le jeton contient l'identifiant et le rôle de l'utilisateur. Il est signé avec la clé `JWT_SECRET`, que la gateway utilise pour le vérifier : c'est elle qui contrôle l'accès à toutes les routes (R2 §1.2). Ce service n'est jamais exposé directement.
+
 ## Architecture
+
+```
 fr.nordlys.shoploc.accounts
-├── api/ entrée HTTP : controllers, DTO
-├── domain/ métier pur, sans framework
-│ ├── model/ Account, LoyaltyCard…
-│ ├── port/ contrats de persistance
-│ └── service/ logique métier
-└── infrastructure/persistence/ accès à PostgreSQL
-├── entity/
-├── repository/
-└── adapter/ implémentations des ports
+├── api/                         entrée HTTP
+│   ├── controller/              routes et traduction des erreurs en codes HTTP
+│   └── dto/                     objets JSON échangés
+├── domain/                      métier pur, sans framework
+│   ├── exception/               erreurs métier
+│   ├── model/                   Account, LoyaltyCard…
+│   ├── port/                    contrats vers l'extérieur : base, chiffrement, jeton
+│   └── service/                 logique métier
+└── infrastructure/              implémentations techniques
+    ├── config/                  déclaration des services et sécurité
+    ├── persistence/             accès à PostgreSQL : entity, repository, adapter
+    └── security/                chiffrement BCrypt et émission des JWT
+```
 
 ## Lancer le service en local
 
@@ -35,7 +51,7 @@ Prérequis : Java 21 et Docker Desktop démarré.
 ./mvnw spring-boot:test-run
 ```
 
-Le service démarre sur http://localhost:8082 avec une base PostgreSQL temporaire, créée automatiquement dans Docker.
+Le service démarre sur http://localhost:8082 avec une base PostgreSQL temporaire, créée automatiquement dans Docker, et une clé de signature de test.
 
 ## Tests
 
@@ -57,6 +73,7 @@ docker build -t service-accounts:local .
 | `SPRING_DATASOURCE_USERNAME` | `accounts` |
 | `SPRING_DATASOURCE_PASSWORD` | `accounts` |
 | `SERVER_PORT` | `8082` |
+| `JWT_SECRET` | aucun : obligatoire, 32 caractères minimum |
 
 ## Contribuer
 

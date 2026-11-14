@@ -2,6 +2,9 @@ package fr.nordlys.shoploc.accounts.infrastructure.config;
 
 import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.port.LoyaltyCardPort;
+import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
+import fr.nordlys.shoploc.accounts.domain.port.TokenIssuer;
+import fr.nordlys.shoploc.accounts.domain.service.AuthenticationService;
 import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardService;
@@ -27,5 +30,11 @@ public class DomainServicesConfiguration {
     InShopRegistrationService inShopRegistrationService(AccountPort accountPort,
                                                         LoyaltyCardService loyaltyCardService) {
         return new InShopRegistrationService(accountPort, loyaltyCardService);
+    }
+
+    @Bean
+    AuthenticationService authenticationService(AccountPort accountPort, PasswordHasher passwordHasher,
+                                                TokenIssuer tokenIssuer) {
+        return new AuthenticationService(accountPort, passwordHasher, tokenIssuer);
     }
 }
