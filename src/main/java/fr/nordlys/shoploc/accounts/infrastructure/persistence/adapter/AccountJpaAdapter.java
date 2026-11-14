@@ -59,4 +59,17 @@ public class AccountJpaAdapter implements AccountPort {
     public boolean existsByEmail(String email) {
         return jpaRepository.existsByEmail(email);
     }
+
+    @Override
+    public Optional<String> findPasswordHash(Long accountId) {
+        return jpaRepository.findById(accountId).map(AccountEntity::getPasswordHash);
+    }
+
+    @Override
+    public void savePasswordHash(Long accountId, String passwordHash) {
+        AccountEntity entity = jpaRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown account: " + accountId));
+        entity.setPasswordHash(passwordHash);
+        jpaRepository.save(entity);
+    }
 }
