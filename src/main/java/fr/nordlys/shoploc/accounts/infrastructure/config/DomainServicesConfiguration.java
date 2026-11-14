@@ -6,14 +6,11 @@ import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
 import fr.nordlys.shoploc.accounts.domain.port.TokenIssuer;
 import fr.nordlys.shoploc.accounts.domain.service.AuthenticationService;
 import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
+import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Declares the domain services as Spring beans.
- * The domain has no Spring annotation (see README), so services are created here.
- */
 @Configuration
 public class DomainServicesConfiguration {
 
@@ -22,6 +19,13 @@ public class DomainServicesConfiguration {
         return new LoyaltyCardService(cardPort);
     }
 
+    // declare le service de consultation des cartes
+    @Bean
+    LoyaltyCardQueryService loyaltyCardQueryService(LoyaltyCardPort cardPort) {
+        return new LoyaltyCardQueryService(cardPort);
+    }
+
+    // declare le service d'inscription en magasin
     @Bean
     InShopRegistrationService inShopRegistrationService(AccountPort accountPort,
                                                         LoyaltyCardService loyaltyCardService) {
