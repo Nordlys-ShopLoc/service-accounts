@@ -1,9 +1,7 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
+package fr.nordlys.shoploc.accounts.api.controller;
 
-import fr.nordlys.shoploc.accounts.domain.model.Account;
-import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
-import fr.nordlys.shoploc.accounts.infrastructure.web.dto.LoyaltyCardResponse;
+import fr.nordlys.shoploc.accounts.api.dto.LoyaltyCardResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,21 +13,17 @@ import org.springframework.web.bind.annotation.*;
 public class LoyaltyCardController {
 
     private final LoyaltyCardQueryService service;
-    private final AccountPort accountPort;
 
-    public LoyaltyCardController(LoyaltyCardQueryService service, AccountPort accountPort) {
+    public LoyaltyCardController(LoyaltyCardQueryService service) {
         this.service = service;
-        this.accountPort = accountPort;
     }
 
     // recupere la carte du client connecte
     @GetMapping("/me")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<LoyaltyCardResponse> getMyCard(Authentication authentication) {
-        Account account = accountPort.findByEmail(authentication.getName())
-                .orElseThrow(() -> new IllegalArgumentException("Compte introuvable"));
-
-        return ResponseEntity.ok(LoyaltyCardResponse.from(service.getCardByAccountId(account.id())));
+        Long accountId = Long.valueOf(authentication.getName());
+        return ResponseEntity.ok(LoyaltyCardResponse.from(service.getCardByAccountId(accountId)));
     }
 
     // identifie une carte a partir du qr code

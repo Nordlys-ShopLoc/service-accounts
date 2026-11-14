@@ -1,4 +1,4 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
+package fr.nordlys.shoploc.accounts.api.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

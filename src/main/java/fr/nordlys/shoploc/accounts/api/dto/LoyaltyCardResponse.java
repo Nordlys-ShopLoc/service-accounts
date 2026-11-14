@@ -1,4 +1,4 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.dto;
+package fr.nordlys.shoploc.accounts.api.dto;
 
 import fr.nordlys.shoploc.accounts.domain.model.LoyaltyCard;
 import fr.nordlys.shoploc.accounts.domain.model.CardStatus;
