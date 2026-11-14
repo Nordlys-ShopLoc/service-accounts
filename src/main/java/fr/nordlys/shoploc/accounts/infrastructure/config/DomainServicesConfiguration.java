@@ -3,13 +3,14 @@ package fr.nordlys.shoploc.accounts.infrastructure.config;
 import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.port.LoyaltyCardPort;
 import fr.nordlys.shoploc.accounts.domain.port.OnlineRegistrationPort;
+import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
+import fr.nordlys.shoploc.accounts.domain.port.TokenIssuer;
+import fr.nordlys.shoploc.accounts.domain.service.AuthenticationService;
 import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardService;
 import fr.nordlys.shoploc.accounts.domain.service.RegistrationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DomainServicesConfiguration {
@@ -25,15 +26,16 @@ public class DomainServicesConfiguration {
         return new InShopRegistrationService(accountPort, loyaltyCardService);
     }
 
+    @Bean
+    AuthenticationService authenticationService(AccountPort accountPort, PasswordHasher passwordHasher,
+                                                TokenIssuer tokenIssuer) {
+        return new AuthenticationService(accountPort, passwordHasher, tokenIssuer);
+    }
+
     // declare le service d'inscription des clients
     @Bean
     RegistrationService registrationService(AccountPort accountPort, OnlineRegistrationPort registrationPort,
-                                            LoyaltyCardService loyaltyCardService, PasswordEncoder passwordEncoder) {
-        return new RegistrationService(accountPort, registrationPort, loyaltyCardService, passwordEncoder);
-    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+                                            LoyaltyCardService loyaltyCardService, PasswordHasher passwordHasher) {
+        return new RegistrationService(accountPort, registrationPort, loyaltyCardService, passwordHasher);
     }
 }
