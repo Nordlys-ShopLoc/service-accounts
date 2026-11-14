@@ -1,4 +1,4 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.dto;
+package fr.nordlys.shoploc.accounts.api.dto;
 
 // informations renvoyees apres inscription
 public record RegistrationResponse(

@@ -12,7 +12,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.UUID;
@@ -35,7 +35,7 @@ class RegistrationIntegrationTest {
     private LoyaltyCardJpaRepository cardRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordHasher passwordHasher;
 
     @MockitoSpyBean
     private LoyaltyCardPort cardPort;
@@ -51,7 +51,7 @@ class RegistrationIntegrationTest {
 
         assertEquals(Role.CLIENT, saved.getRole());
         assertNotEquals("Password123", saved.getPasswordHash());
-        assertTrue(passwordEncoder.matches("Password123", saved.getPasswordHash()));
+        assertTrue(passwordHasher.matches("Password123", saved.getPasswordHash()));
 
         var card = cardRepository.findByAccountId(account.id()).orElseThrow();
 

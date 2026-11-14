@@ -6,8 +6,9 @@ import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.port.OnlineRegistrationPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import fr.nordlys.shoploc.accounts.infrastructure.security.BCryptPasswordHasher;
+import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
+import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -19,14 +20,14 @@ class RegistrationServiceTest {
     private OnlineRegistrationPort registrationPort;
     private LoyaltyCardService cardService;
     private RegistrationService service;
-    private PasswordEncoder encoder;
+    private PasswordHasher encoder;
 
     @BeforeEach
     void setUp() {
         accountPort = mock(AccountPort.class);
         registrationPort = mock(OnlineRegistrationPort.class);
         cardService = mock(LoyaltyCardService.class);
-        encoder = new BCryptPasswordEncoder();
+        encoder = new BCryptPasswordHasher();
         service = new RegistrationService(accountPort, registrationPort, cardService, encoder);
     }
 
@@ -57,7 +58,7 @@ class RegistrationServiceTest {
     @Test
     void rejectsDuplicateEmail() {
         when(accountPort.existsByEmail("client@test.fr")).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> service.register("Marie", "Martin", "client@test.fr", "Password123"));
+        assertThrows(EmailAlreadyUsedException.class, () -> service.register("Marie", "Martin", "client@test.fr", "Password123"));
         verifyNoInteractions(registrationPort, cardService);
     }
 

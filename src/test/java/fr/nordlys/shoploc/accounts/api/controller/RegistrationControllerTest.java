@@ -1,6 +1,7 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
+package fr.nordlys.shoploc.accounts.api.controller;
 
-import fr.nordlys.shoploc.accounts.infrastructure.config.RegistrationSecurityConfiguration;
+import fr.nordlys.shoploc.accounts.infrastructure.config.SecurityConfiguration;
+import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import org.springframework.context.annotation.Import;
 import fr.nordlys.shoploc.accounts.domain.model.Account;
 import fr.nordlys.shoploc.accounts.domain.model.Role;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(RegistrationController.class)
-@Import(RegistrationSecurityConfiguration.class)
+@Import({SecurityConfiguration.class, ApiExceptionHandler.class})
 class RegistrationControllerTest {
 
     @Autowired
@@ -77,7 +78,7 @@ class RegistrationControllerTest {
     @Test
     void shouldRejectDuplicateEmail() throws Exception {
         when(registrationService.register(anyString(), anyString(), anyString(), anyString()))
-                .thenThrow(new IllegalArgumentException("Cette adresse email est deja utilisee"));
+                .thenThrow(new EmailAlreadyUsedException("client@test.fr"));
 
         mockMvc.perform(post("/api/v1/accounts/register")
                         .contentType(MediaType.APPLICATION_JSON)

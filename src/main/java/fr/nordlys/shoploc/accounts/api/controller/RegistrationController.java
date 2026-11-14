@@ -1,9 +1,9 @@
-package fr.nordlys.shoploc.accounts.infrastructure.web.controller;
+package fr.nordlys.shoploc.accounts.api.controller;
 
 import fr.nordlys.shoploc.accounts.domain.model.Account;
 import fr.nordlys.shoploc.accounts.domain.service.RegistrationService;
-import fr.nordlys.shoploc.accounts.infrastructure.web.dto.RegistrationRequest;
-import fr.nordlys.shoploc.accounts.infrastructure.web.dto.RegistrationResponse;
+import fr.nordlys.shoploc.accounts.api.dto.RegistrationRequest;
+import fr.nordlys.shoploc.accounts.api.dto.RegistrationResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

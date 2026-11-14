@@ -5,7 +5,8 @@ import fr.nordlys.shoploc.accounts.domain.model.Role;
 import fr.nordlys.shoploc.accounts.domain.model.UserStatus;
 import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.domain.port.OnlineRegistrationPort;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
+import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -17,14 +18,14 @@ public class RegistrationService {
     private final AccountPort accountPort;
     private final OnlineRegistrationPort registrationPort;
     private final LoyaltyCardService cardService;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordHasher passwordHasher;
 
     public RegistrationService(AccountPort accountPort, OnlineRegistrationPort registrationPort,
-                               LoyaltyCardService cardService, PasswordEncoder passwordEncoder) {
+                               LoyaltyCardService cardService, PasswordHasher passwordHasher) {
         this.accountPort = accountPort;
         this.registrationPort = registrationPort;
         this.cardService = cardService;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordHasher = passwordHasher;
     }
 
     // cree un compte client et sa carte de fidelite
@@ -46,13 +47,13 @@ public class RegistrationService {
         }
 
         if (accountPort.existsByEmail(normalizedEmail)) {
-            throw new IllegalArgumentException("Cette adresse email est deja utilisee");
+            throw new EmailAlreadyUsedException(normalizedEmail);
         }
 
         Account account = new Account(null, normalizedEmail, firstName.trim(), lastName.trim(),
                 null, null, Role.CLIENT, UserStatus.ACTIVE, LocalDateTime.now());
 
-        String passwordHash = passwordEncoder.encode(password);
+        String passwordHash = passwordHasher.hash(password);
         Account savedAccount = registrationPort.saveWithPassword(account, passwordHash);
 
         cardService.issueCard(savedAccount.id(), false);
