@@ -31,4 +31,16 @@ public record Account(
     public boolean isAdmin() {
         return role == Role.ADMIN;
     }
+
+    public boolean isDeleted() {
+        return status == UserStatus.DELETED;
+    }
+
+    public Account withStatus(UserStatus newStatus) {
+        return new Account(id, email, firstName, lastName, phone, licensePlate, role, newStatus, createdAt);
+    }
+
+    public Account withRole(Role newRole) {
+        return new Account(id, email, firstName, lastName, phone, licensePlate, newRole, status, createdAt);
+    }
 }
