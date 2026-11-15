@@ -5,6 +5,7 @@ import fr.nordlys.shoploc.accounts.domain.port.LoyaltyCardPort;
 import fr.nordlys.shoploc.accounts.domain.port.OnlineRegistrationPort;
 import fr.nordlys.shoploc.accounts.domain.port.PasswordHasher;
 import fr.nordlys.shoploc.accounts.domain.port.TokenIssuer;
+import fr.nordlys.shoploc.accounts.domain.service.AccountManagementService;
 import fr.nordlys.shoploc.accounts.domain.service.AuthenticationService;
 import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
@@ -38,6 +39,11 @@ public class DomainServicesConfiguration {
     AuthenticationService authenticationService(AccountPort accountPort, PasswordHasher passwordHasher,
                                                 TokenIssuer tokenIssuer) {
         return new AuthenticationService(accountPort, passwordHasher, tokenIssuer);
+    }
+
+    @Bean
+    AccountManagementService accountManagementService(AccountPort accountPort) {
+        return new AccountManagementService(accountPort);
     }
 
     // declare le service d'inscription des clients
