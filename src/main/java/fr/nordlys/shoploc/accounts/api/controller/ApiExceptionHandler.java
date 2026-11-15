@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.ResponseEntity;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -32,5 +33,10 @@ public class ApiExceptionHandler {
     @ExceptionHandler({EmailAlreadyUsedException.class, CardAlreadyIssuedException.class})
     ProblemDetail conflict(RuntimeException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
+    @ExceptionHandler(fr.nordlys.shoploc.accounts.domain.exception.AccountNotFoundException.class)
+    public ResponseEntity<String> handleAccountNotFound(Exception ex) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
