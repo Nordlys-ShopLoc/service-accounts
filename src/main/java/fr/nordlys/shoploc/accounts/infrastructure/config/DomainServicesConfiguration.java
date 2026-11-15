@@ -36,6 +36,8 @@ public class DomainServicesConfiguration {
     @Bean
     AccountManagementService accountManagementService(AccountPort accountPort) {
         return new AccountManagementService(accountPort);
+    }
+
     // declare le service d'inscription des clients
     @Bean
     RegistrationService registrationService(AccountPort accountPort, OnlineRegistrationPort registrationPort,
