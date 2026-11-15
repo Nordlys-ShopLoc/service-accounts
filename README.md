@@ -78,3 +78,11 @@ docker build -t service-accounts:local .
 ## Contribuer
 
 Une branche `feature/...` par user story, créée depuis `develop`. Commits au format Conventional Commits, en anglais. Pull request vers `develop`, relue par un autre membre, avec la CI au vert.
+
+## Identité de l'utilisateur
+
+La gateway vérifie le jeton et transmet l'identité dans deux en-têtes, `X-User-Id` et `X-User-Role`. Accounts en fait un utilisateur Spring :
+
+- `authentication.getName()` donne l'identifiant du compte ;
+- le rôle devient `ROLE_CLIENT`, `ROLE_MERCHANT`, etc., donc `@PreAuthorize("hasRole('CLIENT')")` fonctionne ;
+- dans les tests : `@WithMockUser(username = "10", roles = "CLIENT")`.
