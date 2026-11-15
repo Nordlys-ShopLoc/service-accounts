@@ -8,6 +8,7 @@ import fr.nordlys.shoploc.accounts.domain.port.TokenIssuer;
 import fr.nordlys.shoploc.accounts.domain.service.AuthenticationService;
 import fr.nordlys.shoploc.accounts.domain.service.InShopRegistrationService;
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardService;
+import fr.nordlys.shoploc.accounts.domain.service.PersonalDataService;
 import fr.nordlys.shoploc.accounts.domain.service.RegistrationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,5 +38,10 @@ public class DomainServicesConfiguration {
     RegistrationService registrationService(AccountPort accountPort, OnlineRegistrationPort registrationPort,
                                             LoyaltyCardService loyaltyCardService, PasswordHasher passwordHasher) {
         return new RegistrationService(accountPort, registrationPort, loyaltyCardService, passwordHasher);
+    }
+
+    @Bean
+    PersonalDataService personalDataService(AccountPort accountPort, LoyaltyCardPort cardPort) {
+        return new PersonalDataService(accountPort, cardPort);
     }
 }
