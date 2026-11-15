@@ -1,7 +1,9 @@
 package fr.nordlys.shoploc.accounts.api.controller;
 
 import fr.nordlys.shoploc.accounts.domain.exception.AccountNotActiveException;
+import fr.nordlys.shoploc.accounts.domain.exception.AccountNotFoundException;
 import fr.nordlys.shoploc.accounts.domain.exception.CardAlreadyIssuedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBalanceNotEmptyException;
 import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import fr.nordlys.shoploc.accounts.domain.exception.InvalidCredentialsException;
 import fr.nordlys.shoploc.accounts.domain.exception.OperationNotAllowedException;
@@ -12,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.ResponseEntity;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -49,8 +50,13 @@ public class ApiExceptionHandler {
                 HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
-    @ExceptionHandler(fr.nordlys.shoploc.accounts.domain.exception.AccountNotFoundException.class)
-    public ResponseEntity<String> handleAccountNotFound(Exception ex) {
-        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(ex.getMessage());
+    @ExceptionHandler(AccountNotFoundException.class)
+    ProblemDetail notFound(AccountNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(CardBalanceNotEmptyException.class)
+    ProblemDetail cardNotEmpty(CardBalanceNotEmptyException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
     }
 }
