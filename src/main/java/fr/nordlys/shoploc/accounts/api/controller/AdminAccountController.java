@@ -1,6 +1,6 @@
 package fr.nordlys.shoploc.accounts.api.controller;
 
-import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.api.dto.AccountResponse;
 import fr.nordlys.shoploc.accounts.domain.model.Role;
 import fr.nordlys.shoploc.accounts.domain.service.AccountManagementService;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/accounts")
+@RequestMapping("/api/v1/accounts")
 public class AdminAccountController {
 
     private final AccountManagementService accountManagementService;
@@ -19,31 +19,43 @@ public class AdminAccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Account>> listAccounts(
-            @RequestHeader("X-Admin-Id") Long adminId,
+    public ResponseEntity<List<AccountResponse>> listAccounts(
+            @RequestHeader("X-User-Id") Long adminId,
             @RequestParam(required = false) Role role) {
-        return ResponseEntity.ok(accountManagementService.listAccounts(adminId, role));
+
+        List<AccountResponse> responses = accountManagementService.listAccounts(adminId, role)
+                .stream()
+                .map(AccountResponse::fromDomain)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{id}/suspend")
-    public ResponseEntity<Account> suspendAccount(
-            @RequestHeader("X-Admin-Id") Long adminId,
+    public ResponseEntity<AccountResponse> suspendAccount(
+            @RequestHeader("X-User-Id") Long adminId,
             @PathVariable("id") Long targetAccountId) {
-        return ResponseEntity.ok(accountManagementService.suspendAccount(adminId, targetAccountId));
+
+        var account = accountManagementService.suspendAccount(adminId, targetAccountId);
+        return ResponseEntity.ok(AccountResponse.fromDomain(account));
     }
 
     @PutMapping("/{id}/reactivate")
-    public ResponseEntity<Account> reactivateAccount(
-            @RequestHeader("X-Admin-Id") Long adminId,
+    public ResponseEntity<AccountResponse> reactivateAccount(
+            @RequestHeader("X-User-Id") Long adminId,
             @PathVariable("id") Long targetAccountId) {
-        return ResponseEntity.ok(accountManagementService.reactivateAccount(adminId, targetAccountId));
+
+        var account = accountManagementService.reactivateAccount(adminId, targetAccountId);
+        return ResponseEntity.ok(AccountResponse.fromDomain(account));
     }
 
     @PutMapping("/{id}/role")
-    public ResponseEntity<Account> changeRole(
-            @RequestHeader("X-Admin-Id") Long adminId,
+    public ResponseEntity<AccountResponse> changeRole(
+            @RequestHeader("X-User-Id") Long adminId,
             @PathVariable("id") Long targetAccountId,
             @RequestParam Role newRole) {
-        return ResponseEntity.ok(accountManagementService.changeRole(adminId, targetAccountId, newRole));
+
+        var account = accountManagementService.changeRole(adminId, targetAccountId, newRole);
+        return ResponseEntity.ok(AccountResponse.fromDomain(account));
     }
 }

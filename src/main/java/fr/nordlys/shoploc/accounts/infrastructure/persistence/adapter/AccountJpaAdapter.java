@@ -1,56 +1,50 @@
 package fr.nordlys.shoploc.accounts.infrastructure.persistence.adapter;
 
-import fr.nordlys.shoploc.accounts.domain.model.Account;
-import fr.nordlys.shoploc.accounts.domain.model.Role;
-import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
 import fr.nordlys.shoploc.accounts.infrastructure.persistence.entity.AccountEntity;
 import fr.nordlys.shoploc.accounts.infrastructure.persistence.repository.AccountJpaRepository;
-import org.springframework.stereotype.Component;
+import fr.nordlys.shoploc.accounts.domain.model.Account;
+import fr.nordlys.shoploc.accounts.domain.port.AccountPort;
+import fr.nordlys.shoploc.accounts.domain.model.Role;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
+/** Adapter: binds the domain port to JPA persistence. */
+@Repository
 public class AccountJpaAdapter implements AccountPort {
 
-    private final AccountJpaRepository repository;
+    private final AccountJpaRepository jpaRepository;
 
-    public AccountJpaAdapter(AccountJpaRepository repository) {
-        this.repository = repository;
+    public AccountJpaAdapter(AccountJpaRepository jpaRepository) {
+        this.jpaRepository = jpaRepository;
     }
 
     @Override
     public Optional<Account> findById(Long id) {
-        return repository.findById(id).map(AccountEntity::toDomain);
+        return jpaRepository.findById(id).map(AccountEntity::toDomain);
     }
 
     @Override
     public Optional<Account> findByEmail(String email) {
-        return repository.findByEmail(email).map(AccountEntity::toDomain);
-    }
-
-    @Override
-    public Optional<String> findPasswordHash(Long accountId) {
-        return repository.findById(accountId).map(AccountEntity::getPasswordHash);
+        return jpaRepository.findByEmail(email).map(AccountEntity::toDomain);
     }
 
     @Override
     public List<Account> findAll() {
-        return repository.findAll().stream().map(AccountEntity::toDomain).toList();
+        return jpaRepository.findAll().stream().map(AccountEntity::toDomain).toList();
     }
 
     @Override
     public List<Account> findByRole(Role role) {
-        return repository.findByRole(role).stream().map(AccountEntity::toDomain).toList();
+        return jpaRepository.findByRole(role).stream().map(AccountEntity::toDomain).toList();
     }
 
     @Override
     public Account save(Account account) {
-        // Logique sécurisée : on récupère l'entité pour ne pas écraser le mot de passe
-        AccountEntity entity = (account.id() != null)
-                ? repository.findById(account.id()).orElseGet(AccountEntity::new)
-                : new AccountEntity();
-
+        AccountEntity entity = account.id() == null
+                ? new AccountEntity()
+                : jpaRepository.findById(account.id()).orElseGet(AccountEntity::new);
         entity.setEmail(account.email());
         entity.setFirstName(account.firstName());
         entity.setLastName(account.lastName());
@@ -58,20 +52,24 @@ public class AccountJpaAdapter implements AccountPort {
         entity.setLicensePlate(account.licensePlate());
         entity.setRole(account.role());
         entity.setStatus(account.status());
-
-        return repository.save(entity).toDomain();
+        return jpaRepository.save(entity).toDomain();
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return repository.existsByEmail(email);
+        return jpaRepository.existsByEmail(email);
     }
 
     @Override
-    public void savePasswordHash(Long accountId, String hash) {
-        repository.findById(accountId).ifPresent(entity -> {
-            entity.setPasswordHash(hash);
-            repository.save(entity);
-        });
+    public Optional<String> findPasswordHash(Long accountId) {
+        return jpaRepository.findById(accountId).map(AccountEntity::getPasswordHash);
+    }
+
+    @Override
+    public void savePasswordHash(Long accountId, String passwordHash) {
+        AccountEntity entity = jpaRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown account: " + accountId));
+        entity.setPasswordHash(passwordHash);
+        jpaRepository.save(entity);
     }
 }

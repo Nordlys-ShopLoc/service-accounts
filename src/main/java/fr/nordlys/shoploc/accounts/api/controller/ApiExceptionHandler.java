@@ -27,4 +27,9 @@ public class ApiExceptionHandler {
     ProblemDetail conflict(RuntimeException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
     }
+
+    @ExceptionHandler(fr.nordlys.shoploc.accounts.domain.exception.AccountNotFoundException.class)
+    public ResponseEntity<String> handleAccountNotFound(Exception ex) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }
