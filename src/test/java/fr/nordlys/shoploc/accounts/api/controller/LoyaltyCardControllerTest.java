@@ -1,14 +1,14 @@
 package fr.nordlys.shoploc.accounts.api.controller;
 
 import fr.nordlys.shoploc.accounts.domain.service.LoyaltyCardQueryService;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBlockedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,24 +37,24 @@ class LoyaltyCardControllerTest {
     // verifie la reponse quand la carte est introuvable
     @Test
     void missingCardReturnsNotFound() {
-        LoyaltyCardExceptionHandler handler = new LoyaltyCardExceptionHandler();
+        ApiExceptionHandler handler = new ApiExceptionHandler();
 
-        ResponseEntity<Map<String, String>> response =
-                handler.cardNotFound(new IllegalArgumentException("Carte introuvable"));
+        org.springframework.http.ProblemDetail response =
+                handler.cardNotFound(new CardNotFoundException());
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Carte introuvable", response.getBody().get("error"));
+        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(response.getStatus()));
+        assertEquals("Carte de fidélité introuvable", response.getDetail());
     }
 
     // verifie la reponse quand la carte est bloquee
     @Test
     void blockedCardReturnsForbidden() {
-        LoyaltyCardExceptionHandler handler = new LoyaltyCardExceptionHandler();
+        ApiExceptionHandler handler = new ApiExceptionHandler();
 
-        ResponseEntity<Map<String, String>> response =
-                handler.cardBlocked(new IllegalStateException("Carte bloquee"));
+        org.springframework.http.ProblemDetail response =
+                handler.cardBlocked(new CardBlockedException());
 
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals("Carte bloquee", response.getBody().get("error"));
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(response.getStatus()));
+        assertEquals("La carte de fidélité est bloquée", response.getDetail());
     }
 }

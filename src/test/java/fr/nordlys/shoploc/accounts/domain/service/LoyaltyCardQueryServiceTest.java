@@ -2,6 +2,8 @@
 package fr.nordlys.shoploc.accounts.domain.service;
 
 import fr.nordlys.shoploc.accounts.domain.model.CardStatus;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBlockedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardNotFoundException;
 import fr.nordlys.shoploc.accounts.domain.model.LoyaltyCard;
 import fr.nordlys.shoploc.accounts.domain.port.LoyaltyCardPort;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,7 @@ class LoyaltyCardQueryServiceTest {
 
         when(cardPort.findByAccountId(10L)).thenReturn(Optional.of(card));
 
-        assertThrows(IllegalStateException.class, () -> service.getCardByAccountId(10L));
+        assertThrows(CardBlockedException.class, () -> service.getCardByAccountId(10L));
     }
 
  // verifie qu'une erreur est retournee si le client n'a pas de carte
@@ -46,7 +48,7 @@ class LoyaltyCardQueryServiceTest {
     void shouldRejectMissingCard() {
         when(cardPort.findByAccountId(10L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.getCardByAccountId(10L));
+        assertThrows(CardNotFoundException.class, () -> service.getCardByAccountId(10L));
     }
 
     // verifie qu'une carte active peut etre retrouvee avec son qr code
@@ -69,7 +71,7 @@ class LoyaltyCardQueryServiceTest {
 
         when(cardPort.findByQrCode("QR123")).thenReturn(Optional.of(card));
 
-        assertThrows(IllegalStateException.class, () -> service.getCardByQrCode("QR123"));
+        assertThrows(CardBlockedException.class, () -> service.getCardByQrCode("QR123"));
     }
 
     // verifie qu'un qr code inconnu est refuse
@@ -77,7 +79,7 @@ class LoyaltyCardQueryServiceTest {
     void shouldRejectUnknownQrCode() {
         when(cardPort.findByQrCode("UNKNOWN")).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.getCardByQrCode("UNKNOWN"));
+        assertThrows(CardNotFoundException.class, () -> service.getCardByQrCode("UNKNOWN"));
     }
 
 }

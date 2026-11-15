@@ -5,6 +5,8 @@ import fr.nordlys.shoploc.accounts.domain.exception.CardAlreadyIssuedException;
 import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import fr.nordlys.shoploc.accounts.domain.exception.InvalidCredentialsException;
 import fr.nordlys.shoploc.accounts.domain.exception.OperationNotAllowedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBlockedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.ProblemDetail;
@@ -32,5 +34,17 @@ public class ApiExceptionHandler {
     @ExceptionHandler({EmailAlreadyUsedException.class, CardAlreadyIssuedException.class})
     ProblemDetail conflict(RuntimeException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
+    @ExceptionHandler(CardNotFoundException.class)
+    ProblemDetail cardNotFound(CardNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(CardBlockedException.class)
+    ProblemDetail cardBlocked(CardBlockedException exception) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, exception.getMessage());
     }
 }

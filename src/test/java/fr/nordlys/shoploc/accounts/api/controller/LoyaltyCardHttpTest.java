@@ -5,7 +5,9 @@ import fr.nordlys.shoploc.accounts.domain.model.LoyaltyCard;
 import fr.nordlys.shoploc.accounts.domain.model.CardStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import fr.nordlys.shoploc.accounts.infrastructure.config.MethodSecurityConfiguration;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBlockedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardNotFoundException;
+import fr.nordlys.shoploc.accounts.infrastructure.config.SecurityConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -21,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(LoyaltyCardController.class)
-@Import({MethodSecurityConfiguration.class, LoyaltyCardExceptionHandler.class})
+@Import({SecurityConfiguration.class, ApiExceptionHandler.class})
 class LoyaltyCardHttpTest {
 
     @Autowired
@@ -34,7 +36,7 @@ class LoyaltyCardHttpTest {
     @Test
     void anonymousUserCannotScanCard() throws Exception {
         mockMvc.perform(get("/api/v1/cards/scan/QR123"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         verifyNoInteractions(service);
     }
@@ -54,7 +56,7 @@ class LoyaltyCardHttpTest {
     @WithMockUser(roles = "MERCHANT")
     void merchantGetsNotFoundForUnknownCard() throws Exception {
         when(service.getCardByQrCode("UNKNOWN"))
-                .thenThrow(new IllegalArgumentException("Carte introuvable"));
+                .thenThrow(new CardNotFoundException());
 
         mockMvc.perform(get("/api/v1/cards/scan/UNKNOWN")
                         .accept(MediaType.APPLICATION_JSON))
@@ -66,7 +68,7 @@ class LoyaltyCardHttpTest {
     @WithMockUser(roles = "MERCHANT")
     void merchantGetsForbiddenForBlockedCard() throws Exception {
         when(service.getCardByQrCode("BLOCKED"))
-                .thenThrow(new IllegalStateException("Carte bloquee"));
+                .thenThrow(new CardBlockedException());
 
         mockMvc.perform(get("/api/v1/cards/scan/BLOCKED")
                         .accept(MediaType.APPLICATION_JSON))
