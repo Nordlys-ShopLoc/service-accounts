@@ -1,7 +1,9 @@
 package fr.nordlys.shoploc.accounts.api.controller;
 
 import fr.nordlys.shoploc.accounts.domain.exception.AccountNotActiveException;
+import fr.nordlys.shoploc.accounts.domain.exception.AccountNotFoundException;
 import fr.nordlys.shoploc.accounts.domain.exception.CardAlreadyIssuedException;
+import fr.nordlys.shoploc.accounts.domain.exception.CardBalanceNotEmptyException;
 import fr.nordlys.shoploc.accounts.domain.exception.EmailAlreadyUsedException;
 import fr.nordlys.shoploc.accounts.domain.exception.InvalidCredentialsException;
 import fr.nordlys.shoploc.accounts.domain.exception.OperationNotAllowedException;
@@ -31,6 +33,16 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler({EmailAlreadyUsedException.class, CardAlreadyIssuedException.class})
     ProblemDetail conflict(RuntimeException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    ProblemDetail notFound(AccountNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(CardBalanceNotEmptyException.class)
+    ProblemDetail cardNotEmpty(CardBalanceNotEmptyException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
     }
 }
